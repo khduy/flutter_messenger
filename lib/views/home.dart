@@ -9,7 +9,7 @@ class Home extends GetWidget<AuthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chats'),
+        title: Text(controller.user.email),
         //centerTitle: true,
         leading: Padding(
           padding: EdgeInsets.all(10),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_messenger/services/databases.dart';
 //import 'package:flutter_messenger/services/shared_preferences.dart';
@@ -12,11 +13,15 @@ class AuthController extends GetxController {
 
   User get user => _user.value;
 
+  // for auto login
+  getCurrentUser() async {
+    _user.value = auth.currentUser;
+  }
+
   @override
-  void onInit() {
-    // when init controller or auth state change, _user will be updated
-    _user.bindStream(auth.authStateChanges());
-    //print(_user.value.displayName);
+  onInit() {
+    getCurrentUser();
+
     super.onInit();
   }
 
@@ -38,6 +43,7 @@ class AuthController extends GetxController {
     UserCredential result = await auth.signInWithCredential(authCredential);
 
     if (result.user != null) {
+      _user.value = result.user;
       // SharedPreferenceHelper().saveUserId(result.user.uid);
       // SharedPreferenceHelper().saveUserEmail(result.user.email);
       // SharedPreferenceHelper().saveUserDisplayName(result.user.displayName);
@@ -50,14 +56,23 @@ class AuthController extends GetxController {
         'userName': result.user.email.replaceAll('@gmail.com', '')
       };
 
-      DatabaseMethods().addUserInforToDB(result.user.uid, userInfor);
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: result.user.email)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        print('new user');
+        DatabaseMethods().addUserInforToDB(result.user.uid, userInfor);
+      } else
+        print('old user');
     }
   }
 
   logOut() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // prefs.clear();
-
+    _user.value = null;
     await auth.signOut();
   }
 }
