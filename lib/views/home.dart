@@ -11,7 +11,7 @@ class Home extends GetWidget<AuthController> {
       appBar: AppBar(
         title: Text('Chats'),
         //centerTitle: true,
-        leading: Padding(
+        leading: Container(
           padding: EdgeInsets.all(10),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
