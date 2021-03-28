@@ -27,48 +27,52 @@ class AuthController extends GetxController {
   }
 
   logInWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
 
-    await googleSignIn.signOut(); // for dont auto select account
+      await googleSignIn.signOut(); // for dont auto select account
 
-    GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+      GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
 
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
 
-    final AuthCredential authCredential = GoogleAuthProvider.credential(
-      idToken: googleSignInAuthentication.idToken,
-      accessToken: googleSignInAuthentication.accessToken,
-    );
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken,
+      );
 
-    UserCredential result = await auth.signInWithCredential(authCredential);
+      UserCredential result = await auth.signInWithCredential(authCredential);
 
-    if (result.user != null) {
-      _user.value = result.user;
-      // SharedPreferenceHelper().saveUserId(result.user.uid);
-      // SharedPreferenceHelper().saveUserEmail(result.user.email);
-      // SharedPreferenceHelper().saveUserDisplayName(result.user.displayName);
-      // SharedPreferenceHelper().saveUserPhotoUrl(result.user.photoURL);
+      if (result.user != null) {
+        _user.value = result.user;
+        // SharedPreferenceHelper().saveUserId(result.user.uid);
+        // SharedPreferenceHelper().saveUserEmail(result.user.email);
+        // SharedPreferenceHelper().saveUserDisplayName(result.user.displayName);
+        // SharedPreferenceHelper().saveUserPhotoUrl(result.user.photoURL);
 
-      Map<String, dynamic> userInfor = {
-        'email': result.user.email,
-        'name': result.user.displayName,
-        'photoUrl': result.user.photoURL,
-        'userName': result.user.email.replaceAll('@gmail.com', '')
-      };
+        Map<String, dynamic> userInfor = {
+          'email': result.user.email,
+          'name': result.user.displayName,
+          'photoUrl': result.user.photoURL,
+          'userName': result.user.email.replaceAll('@gmail.com', '')
+        };
 
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: result.user.email)
-          .get();
+        final QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: result.user.email)
+            .get();
 
-      if (snapshot.docs.isEmpty) {
-        print('new user');
-        DatabaseMethods().addUserInforToDB(result.user.uid, userInfor);
-      } else
-        print('old user');
+        if (snapshot.docs.isEmpty) {
+          print('new user');
+          DatabaseMethods().addUserInforToDB(result.user.uid, userInfor);
+        } else
+          print('old user');
 
-      Get.off(() => Home());
+        Get.off(() => Home());
+      }
+    } catch (e) {
+      Get.snackbar('login failed', e.toString());
     }
   }
 

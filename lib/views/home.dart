@@ -64,6 +64,7 @@ class Home extends GetWidget<AuthController> {
                         UniqueKey(),
                         chatRoomController.chatRooms[index].chatRoomId,
                         chatRoomController.chatRooms[index].lastMessage,
+                        chatRoomController.chatRooms[index].sendBy,
                         peerUserId,
                       );
                     },
@@ -80,17 +81,18 @@ class Home extends GetWidget<AuthController> {
 }
 
 class ChatRoomTile extends StatefulWidget {
-  final String chatRoomId, lastMessage, peerUserId;
-  ChatRoomTile(Key key, this.chatRoomId, this.lastMessage, this.peerUserId) : super(key: key);
+  final String chatRoomId, lastMessage, peerUserId, sendBy;
+  ChatRoomTile(Key key, this.chatRoomId, this.lastMessage, this.sendBy, this.peerUserId)
+      : super(key: key);
   @override
   _ChatRoomTileState createState() => _ChatRoomTileState();
 }
 
 class _ChatRoomTileState extends State<ChatRoomTile> {
-  UserModel user;
+  UserModel peerUser;
 
   getUserInfor() async {
-    user = await DatabaseMethods().getUserInforById(widget.peerUserId);
+    peerUser = await DatabaseMethods().getUserInforById(widget.peerUserId);
     setState(() {});
   }
 
@@ -102,19 +104,27 @@ class _ChatRoomTileState extends State<ChatRoomTile> {
 
   @override
   Widget build(BuildContext context) {
-    return user != null
+    return peerUser != null
         ? ListTile(
-            title: Text(user.name),
-            subtitle: Text(widget.lastMessage),
+            title: Text(peerUser.name),
+            subtitle: peerUser.id != widget.sendBy
+                ? Text(
+                    'You: ' + widget.lastMessage,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : Text(
+                    widget.lastMessage,
+                    overflow: TextOverflow.ellipsis,
+                  ),
             leading: Container(
               width: 50,
               height: 50,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: Image.network(user.photoUrl),
+                child: Image.network(peerUser.photoUrl),
               ),
             ),
-            onTap: () => Get.to(() => ChatScreen(), arguments: user),
+            onTap: () => Get.to(() => ChatScreen(), arguments: peerUser),
           )
         : ListTile(
             title: Center(child: CircularProgressIndicator()),
