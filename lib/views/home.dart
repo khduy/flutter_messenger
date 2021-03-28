@@ -52,6 +52,7 @@ class Home extends GetWidget<AuthController> {
           if (chatRoomController != null && chatRoomController.chatRooms != null) {
             return chatRoomController.chatRooms.length != 0
                 ? ListView.builder(
+                    physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     itemCount: chatRoomController.chatRooms.length,
                     itemBuilder: (context, index) {
                       String peerUserId =

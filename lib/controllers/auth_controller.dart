@@ -68,7 +68,7 @@ class AuthController extends GetxController {
       } else
         print('old user');
 
-      Get.to(() => Home());
+      Get.off(() => Home());
     }
   }
 
