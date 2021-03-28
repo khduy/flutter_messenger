@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_messenger/controllers/auth_controller.dart';
 import 'package:flutter_messenger/controllers/search_controller.dart';
 import 'package:flutter_messenger/services/databases.dart';
 import 'package:flutter_messenger/views/chat.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 
 class Search extends SearchDelegate<String> {
   SearchController searchController = Get.find<SearchController>();
+  AuthController authController = Get.find<AuthController>();
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -44,10 +46,12 @@ class Search extends SearchDelegate<String> {
         itemCount: searchController.getListUser.length,
         itemBuilder: (_, index) {
           return ListTile(
-            onTap: () => Get.off(
-              () => ChatScreen(),
-              arguments: searchController.getListUser[index],
-            ),
+            onTap: () {
+              Get.off(
+                () => ChatScreen(),
+                arguments: searchController.getListUser[index],
+              );
+            },
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(100),
               child: Image.network(searchController.getListUser[index].photoUrl),
@@ -78,10 +82,12 @@ class Search extends SearchDelegate<String> {
             itemCount: searchController.getListUser.length,
             itemBuilder: (_, index) {
               return ListTile(
-                onTap: () => Get.off(
-                  () => ChatScreen(),
-                  arguments: searchController.getListUser[index],
-                ),
+                onTap: () {
+                  Get.off(
+                    () => ChatScreen(),
+                    arguments: searchController.getListUser[index],
+                  );
+                },
                 leading: Container(
                   width: 50,
                   height: 50,

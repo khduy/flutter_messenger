@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_messenger/services/databases.dart';
+import 'package:flutter_messenger/views/home.dart';
 //import 'package:flutter_messenger/services/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -66,13 +67,15 @@ class AuthController extends GetxController {
         DatabaseMethods().addUserInforToDB(result.user.uid, userInfor);
       } else
         print('old user');
+
+      Get.to(() => Home());
     }
   }
 
   logOut() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // prefs.clear();
-    _user.value = null;
+    //_user.value = null;
     await auth.signOut();
   }
 }

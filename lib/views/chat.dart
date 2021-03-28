@@ -14,14 +14,12 @@ class ChatScreen extends StatelessWidget {
 
   String chatRoomId;
 
-  getChatRoomId(String a, String b) {
-    if (a.hashCode <= b.hashCode) return '$a-$b';
-    return '$b-$a';
+  ChatScreen() {
+    chatRoomId = DatabaseMethods().createChatRoomId(user.id, authController.user.uid);
   }
 
   @override
   Widget build(BuildContext context) {
-    chatRoomId = getChatRoomId(authController.user.uid, user.id);
     messageController.messageList.bindStream(DatabaseMethods().messageStream(chatRoomId));
     return Scaffold(
       appBar: AppBar(
@@ -39,91 +37,104 @@ class ChatScreen extends StatelessWidget {
           Text(user.name)
         ]),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Obx(() {
-            if (messageController.messages != null)
-              return Container(
-                padding: EdgeInsets.all(10),
-                child: ListView.separated(
-                  physics: ClampingScrollPhysics(),
-                  shrinkWrap: true,
-                  reverse: true,
-                  itemCount: messageController.messages.length,
-                  itemBuilder: (_, index) => Row(
-                    mainAxisAlignment: user.id == messageController.messages[index].sendBy
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: Get.width * 0.7),
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: user.id == messageController.messages[index].sendBy
-                              ? Colors.black12
-                              : Colors.green,
+      body: Container(
+        height: Get.height,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Obx(() {
+              if (messageController.messages != null)
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      child: ListView.separated(
+                        physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                        reverse: true,
+                        itemCount: messageController.messages.length,
+                        itemBuilder: (context, index) => Row(
+                          mainAxisAlignment:
+                              authController.user.uid == messageController.messages[index].sendBy
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              constraints: BoxConstraints(maxWidth: Get.width * 0.8),
+                              padding: EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: authController.user.uid ==
+                                        messageController.messages[index].sendBy
+                                    ? Colors.green
+                                    : Colors.black12,
+                              ),
+                              child: Text(
+                                messageController.messages[index].message,
+                                style: TextStyle(fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          messageController.messages[index].message,
-                          style: TextStyle(fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    ],
-                  ),
-                  separatorBuilder: (_, index) => SizedBox(height: 5),
-                ),
-              );
-            else
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-          }),
-          Container(
-            padding: EdgeInsets.only(left: 10, bottom: 5),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: TextField(
-                      minLines: 1,
-                      maxLines: 3,
-                      controller: textController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.blue,
-                        border: InputBorder.none,
-                        hintText: 'Aa',
+                        separatorBuilder: (context, index) => SizedBox(height: 5),
                       ),
                     ),
                   ),
-                ),
-                CupertinoButton(
-                  child: Icon(
-                    Icons.send_rounded,
-                    size: 30,
+                );
+              else
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+            }),
+            Container(
+              padding: EdgeInsets.only(left: 10, bottom: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: TextField(
+                        minLines: 1,
+                        maxLines: 3,
+                        controller: textController,
+                        decoration: InputDecoration(
+                          fillColor: Colors.blue,
+                          border: InputBorder.none,
+                          hintText: 'Aa',
+                        ),
+                      ),
+                    ),
                   ),
-                  padding: EdgeInsets.all(0),
-                  onPressed: () {
-                    if (textController.text.trim().isNotEmpty) {
-                      DatabaseMethods().addMessage(
-                        chatRoomId,
-                        authController.user.uid,
-                        textController.text,
-                      );
-                      textController.text = '';
-                    }
-                  },
-                )
-              ],
+                  CupertinoButton(
+                    child: Icon(
+                      Icons.send_rounded,
+                      size: 30,
+                    ),
+                    padding: EdgeInsets.all(0),
+                    onPressed: () {
+                      if (textController.text.trim().isNotEmpty) {
+                        DateTime now = DateTime.now();
+                        DatabaseMethods().createChatRoom(chatRoomId, authController.user.uid,
+                            user.id, textController.text.trim(), now);
+                        DatabaseMethods().addMessage(
+                          chatRoomId,
+                          authController.user.uid,
+                          textController.text.trim(),
+                          now,
+                        );
+                        textController.text = '';
+                      }
+                    },
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
