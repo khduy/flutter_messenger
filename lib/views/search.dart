@@ -7,7 +7,7 @@ import 'package:flutter_messenger/views/chat.dart';
 import 'package:get/get.dart';
 
 class Search extends SearchDelegate<String> {
-  SearchController searchController = Get.find<SearchController>();
+  SearchController searchController = Get.put(SearchController());
   AuthController authController = Get.find<AuthController>();
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -17,7 +17,8 @@ class Search extends SearchDelegate<String> {
           Icons.clear,
         ),
         onPressed: () {
-          close(context, null);
+          //close(context, null);
+          Get.back();
         },
       ),
     ];

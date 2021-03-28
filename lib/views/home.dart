@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_messenger/controllers/auth_controller.dart';
@@ -59,7 +58,9 @@ class Home extends GetWidget<AuthController> {
                           chatRoomController.chatRooms[index].users[0] == controller.user.uid
                               ? chatRoomController.chatRooms[index].users[1]
                               : chatRoomController.chatRooms[index].users[0];
+
                       return ChatRoomTile(
+                        UniqueKey(),
                         chatRoomController.chatRooms[index].chatRoomId,
                         chatRoomController.chatRooms[index].lastMessage,
                         peerUserId,
@@ -79,7 +80,7 @@ class Home extends GetWidget<AuthController> {
 
 class ChatRoomTile extends StatefulWidget {
   final String chatRoomId, lastMessage, peerUserId;
-  ChatRoomTile(this.chatRoomId, this.lastMessage, this.peerUserId);
+  ChatRoomTile(Key key, this.chatRoomId, this.lastMessage, this.peerUserId) : super(key: key);
   @override
   _ChatRoomTileState createState() => _ChatRoomTileState();
 }
