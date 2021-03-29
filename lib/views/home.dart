@@ -4,8 +4,6 @@ import 'package:flutter_messenger/controllers/auth_controller.dart';
 import 'package:flutter_messenger/controllers/chat_room_controller.dart';
 import 'package:flutter_messenger/models/user.dart';
 import 'package:flutter_messenger/services/databases.dart';
-import 'package:flutter_messenger/views/chat.dart';
-import 'package:flutter_messenger/views/login.dart';
 import 'package:flutter_messenger/views/search.dart';
 import 'package:get/get.dart';
 
@@ -42,7 +40,7 @@ class Home extends GetWidget<AuthController> {
             ),
             onPressed: () {
               controller.logOut();
-              Get.off(() => Login());
+              Get.offNamed('/login');
             },
           ),
         ],
@@ -124,7 +122,7 @@ class _ChatRoomTileState extends State<ChatRoomTile> {
                 child: Image.network(peerUser.photoUrl),
               ),
             ),
-            onTap: () => Get.to(() => ChatScreen(), arguments: peerUser),
+            onTap: () => Get.toNamed('/chatScreen', arguments: peerUser),
           )
         : ListTile(
             title: Center(child: CircularProgressIndicator()),

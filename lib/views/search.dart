@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_messenger/controllers/auth_controller.dart';
 import 'package:flutter_messenger/controllers/search_controller.dart';
 import 'package:flutter_messenger/services/databases.dart';
-import 'package:flutter_messenger/views/chat.dart';
 import 'package:get/get.dart';
 
 class Search extends SearchDelegate<String> {
@@ -48,8 +47,8 @@ class Search extends SearchDelegate<String> {
         itemBuilder: (_, index) {
           return ListTile(
             onTap: () {
-              Get.off(
-                () => ChatScreen(),
+              Get.offNamed(
+                '/chatScreen',
                 arguments: searchController.getListUser[index],
               );
             },
@@ -84,8 +83,8 @@ class Search extends SearchDelegate<String> {
             itemBuilder: (_, index) {
               return ListTile(
                 onTap: () {
-                  Get.off(
-                    () => ChatScreen(),
+                  Get.offNamed(
+                    '/chatScreen',
                     arguments: searchController.getListUser[index],
                   );
                 },
